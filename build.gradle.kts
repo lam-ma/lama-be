@@ -1,12 +1,16 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.4.20"
     application
+    idea
+    id("com.github.johnrengelman.shadow") version "4.0.4"
 }
 
 group = "com.lama"
 version = "1.0"
+
 
 repositories {
     jcenter()
@@ -39,5 +43,11 @@ tasks.withType<KotlinCompile>() {
 }
 
 application {
-    mainClassName = "ServerKt"
+    mainClassName = "com.lama.MainKt"
+}
+
+tasks.getByName<ShadowJar>("shadowJar") {
+    archiveBaseName.set("lama")
+    archiveClassifier.set("")
+    archiveVersion.set("")
 }

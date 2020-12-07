@@ -1,3 +1,5 @@
+package com.lama
+
 import io.vertx.core.Vertx
 import io.vertx.kotlin.coroutines.await
 
