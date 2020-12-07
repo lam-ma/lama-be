@@ -1,0 +1,3 @@
+
+rootProject.name = "lama-be"
+
