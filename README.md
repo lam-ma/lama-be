@@ -4,7 +4,7 @@ Hack week (day?) project
 
 Prerequisites:
 -
-Project requires JDK 11+ installed
+Project requires JDK 11+ installed 
 
 How to run
 -
