@@ -20,10 +20,10 @@ repositories {
 }
 
 dependencies {
-    implementation("io.vertx:vertx-web:4.0.0.CR2")
-    implementation("io.vertx:vertx-web-client:4.0.0.CR2")
-    implementation("io.vertx:vertx-lang-kotlin:4.0.0.CR2")
-    implementation("io.vertx:vertx-lang-kotlin-coroutines:4.0.0.CR2")
+    implementation("io.vertx:vertx-web:4.0.0")
+    implementation("io.vertx:vertx-web-client:4.0.0")
+    implementation("io.vertx:vertx-lang-kotlin:4.0.0")
+    implementation("io.vertx:vertx-lang-kotlin-coroutines:4.0.0")
 
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
