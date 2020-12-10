@@ -12,5 +12,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Build with Gradle
+      - name: gradle build
         run: ./gradlew build
+      - name: upload atifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: lama_jar
+          path: build/libs/lama.jar
