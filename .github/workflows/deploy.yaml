@@ -1,4 +1,4 @@
-name: Lama CI
+name: Manual deploy
 
 on: [workflow_dispatch]
 
