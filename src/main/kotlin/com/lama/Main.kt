@@ -3,7 +3,7 @@ package com.lama
 import io.vertx.core.Vertx
 import io.vertx.kotlin.coroutines.await
 
-val picUrl = "https://static.wixstatic.com/media/a612c9_44860425bc124b9390735854ed91f32e~mv2.gif"
+val picUrl = "https://pbs.twimg.com/profile_images/1311712724708188161/EfsqxEuP_400x400.jpg"
 
 suspend fun main() {
     val port = (System.getenv("LAMA_BE_PORT") ?: "8080").toInt()
