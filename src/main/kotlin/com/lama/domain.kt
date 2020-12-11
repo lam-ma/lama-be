@@ -44,4 +44,19 @@ data class Answer(
     val isRight: Boolean
 )
 
+data class Game(
+    val id: GameId,
+    val currentQuestionId: QuestionId,
+    val quizz: Quizz,
+    val state: GameState
+)
+
+enum class GameState {
+    QUESTION,
+    ANSWER,
+    FINISH
+}
+
 class QuizzNotFoundException(message: String) : RuntimeException(message)
+
+class GameNotFoundException(message: String): RuntimeException(message)
