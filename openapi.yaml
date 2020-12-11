@@ -10,7 +10,7 @@ paths:
   /quizzes:
     post:
       summary: Add new quizz
-      operationId: createQuiz
+      operationId: createQuizz
       requestBody:
         content:
           application/json:
@@ -54,6 +54,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Problem"
+    put:
+      summary: Modify existing quizz
+      operationId: editQuizz
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateQuizzRequest"
+      responses:
+        '200':
+          description: Quizz was modified successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quizz"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+
 
   /quizzes/{id}/start:
     post:

@@ -5,6 +5,7 @@ import java.net.URL
 interface QuizzService {
     fun get(id: QuizzId): Quizz
     fun create(quizzDto: CreateQuizzDto): Quizz
+    fun edit(quizzId: QuizzId, quizzDto: CreateQuizzDto): Quizz
 }
 
 class QuizzServiceImpl : QuizzService {
@@ -16,6 +17,13 @@ class QuizzServiceImpl : QuizzService {
         val quizz = Quizz(QuizzId(nextId()), quizzDto.title, quizzDto.questions)
         storage[quizz.id] = quizz
         return quizz
+    }
+
+    override fun edit(quizzId: QuizzId, quizzDto: CreateQuizzDto): Quizz {
+        val quizz = get(quizzId)
+        val modifiedQuizz = quizz.copy(title = quizzDto.title, questions = quizzDto.questions)
+        storage[quizz.id] = modifiedQuizz
+        return modifiedQuizz
     }
 }
 

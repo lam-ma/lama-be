@@ -27,6 +27,12 @@ class HttpApi(
             val quizz = quizzService.create(quizzDto)
             ctx.response().setStatusCode(HttpStatus.CREATED.code).endWithJson(quizz)
         }
+        put("/quizzes/:id").handler { ctx ->
+            val quizzId = QuizzId(ctx.request().getParam("id"))
+            val quizzDto = ctx.bodyAs<CreateQuizzDto>()
+            val quizz = quizzService.edit(quizzId, quizzDto)
+            ctx.response().endWithJson(quizz)
+        }
         get("/quizzes/:id").handler { ctx ->
             val quizzId = QuizzId(ctx.request().getParam("id"))
             val quizz = quizzService.get(quizzId)
