@@ -47,6 +47,15 @@ data class Game(
     val state: GameState
 )
 
+data class HighScore(
+    val scores: List<PlayerScore>
+)
+
+data class PlayerScore(
+    val name: String,
+    val score: Int
+)
+
 enum class GameState {
     QUESTION,
     ANSWER,

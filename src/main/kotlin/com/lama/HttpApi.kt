@@ -39,6 +39,13 @@ class HttpApi(
                 ctx.response().endWithJson(game)
             }
         }
+        get("/games/:id/scores").handler { ctx ->
+            val request = ctx.request()
+            val gameId = GameId(request.getParam("id"))
+            val limit = request.getParam("limit")?.toInt() ?: 5
+            val score = gameService.getHighScore(gameId, limit)
+            ctx.response().endWithJson(score)
+        }
     }
 }
 

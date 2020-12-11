@@ -1,4 +1,4 @@
-GET http://localhost:8080/games/1a8bfd58
+GET http://localhost:8080/quizzes/123
 
 ###
 POST http://localhost:8080/quizzes/123/start
@@ -7,9 +7,13 @@ Content-Type: application/json
 {}
 
 ###
-GET http://localhost:8080/quizzes/123
+GET http://localhost:8080/games/bf1f4e93
 
 ###
+GET http://localhost:8080/games/bf1f4e93/scores
+
+###
+
 
 GET https://lama-api.kvarto.net/quizzes/123
 
