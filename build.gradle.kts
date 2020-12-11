@@ -24,6 +24,10 @@ dependencies {
     implementation("io.vertx:vertx-web-client:4.0.0")
     implementation("io.vertx:vertx-lang-kotlin:4.0.0")
     implementation("io.vertx:vertx-lang-kotlin-coroutines:4.0.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.2")
+    implementation("com.fasterxml.jackson.module:jackson-modules-java8:2.11.2")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.2")
 
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
