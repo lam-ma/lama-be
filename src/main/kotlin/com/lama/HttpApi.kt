@@ -1,11 +1,9 @@
 package com.lama
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.vertx.core.Vertx
 import io.vertx.core.http.HttpServerResponse
 import io.vertx.ext.web.Router
-import io.vertx.ext.web.RoutingContext
 
 class HttpApi(
     val vertx: Vertx,
@@ -29,29 +27,28 @@ class HttpApi(
         router.get("/quizzes/:id").handler { ctx ->
             val quizzId = QuizzId(ctx.request().getParam("id"))
             val quizz = quizzService.get(quizzId)
-            if (quizz != null) {
-                ctx.response().endWithJson(quizz)
-            } else {
-                ctx.response().statusCode = 404
-            }
+            ctx.response().endWithJson(quizz)
         }
         router.post("/quizzes/:id/start").handler { ctx ->
             val quizzId = QuizzId(ctx.request().getParam("id"))
             val gameId = gameService.startGame(quizzId)
             ctx.response().endWithJson(GameIdResponse(gameId))
         }
+        router.get("/games/:id").handler { ctx ->
+            val gameId = GameId(ctx.request().getParam("id"))
+            val game = gameService.get(gameId)
+            if (game == null) {
+                throw GameNotFoundException("Game not found")
+            } else {
+                ctx.response().endWithJson(game)
+            }
+        }
+
         return router
     }
 
     private fun HttpServerResponse.endWithJson(body: Any) {
         putHeader("Content-Type", "application/json").end(mapper.writeValueAsString(body))
     }
-
-    private inline fun <reified T> RoutingContext.bodyAs(): T =
-        runCatching {
-            mapper.readValue<T>(bodyAsString)
-        }.getOrElse {
-            throw IllegalArgumentException("Can't parse request body: ${it.message}")
-        }
 }
 
