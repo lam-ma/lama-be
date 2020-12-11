@@ -4,14 +4,18 @@ import java.net.URL
 
 interface QuizzService {
     fun get(id: QuizzId): Quizz
+    fun create(quizzDto: CreateQuizzDto): Quizz
 }
 
 class QuizzServiceImpl : QuizzService {
-    override fun get(id: QuizzId): Quizz {
-        if (id != SAMPLE_QUIZZ.id) {
-            throw QuizzNotFoundException(id)
-        }
-        return SAMPLE_QUIZZ
+    val storage = mutableMapOf<QuizzId, Quizz>(SAMPLE_QUIZZ.id to SAMPLE_QUIZZ)
+
+    override fun get(id: QuizzId): Quizz = storage[id] ?: throw QuizzNotFoundException(id)
+
+    override fun create(quizzDto: CreateQuizzDto): Quizz {
+        val quizz = Quizz(QuizzId(nextId()), quizzDto.title, quizzDto.questions)
+        storage[quizz.id] = quizz
+        return quizz
     }
 }
 

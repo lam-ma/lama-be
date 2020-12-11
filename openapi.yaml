@@ -7,6 +7,29 @@ info:
 servers:
   - url: https://lama-api.kvarto.net
 paths:
+  /quizzes:
+    post:
+      summary: Add new quizz
+      operationId: createQuiz
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateQuizzRequest"
+      responses:
+        '201':
+          description: Quizz was created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quizz"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+
   /quizzes/{id}:
     get:
       summary: Get full quizz data
@@ -144,6 +167,18 @@ paths:
 
 components:
   schemas:
+    CreateQuizzRequest:
+      type: object
+      required:
+        - title
+        - questions
+      properties:
+        title:
+          type: string
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Question"
     Quizz:
       type: object
       required:

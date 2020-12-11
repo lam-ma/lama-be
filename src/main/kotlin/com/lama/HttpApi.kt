@@ -2,6 +2,7 @@ package com.lama
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lama.web.HttpApiBase
+import com.lama.web.HttpStatus
 import io.vertx.core.Vertx
 import io.vertx.ext.web.Router
 
@@ -21,6 +22,11 @@ class HttpApi(
         get("/health").handler {
             it.response().end("Healthy")
         }
+        post("/quizzes").handler { ctx ->
+            val quizzDto = ctx.bodyAs<CreateQuizzDto>()
+            val quizz = quizzService.create(quizzDto)
+            ctx.response().setStatusCode(HttpStatus.CREATED.code).endWithJson(quizz)
+        }
         get("/quizzes/:id").handler { ctx ->
             val quizzId = QuizzId(ctx.request().getParam("id"))
             val quizz = quizzService.get(quizzId)
@@ -29,7 +35,7 @@ class HttpApi(
         post("/quizzes/:id/start").handler { ctx ->
             val quizzId = QuizzId(ctx.request().getParam("id"))
             val game = gameService.startGame(quizzId)
-            ctx.response().endWithJson(game)
+            ctx.response().setStatusCode(HttpStatus.CREATED.code).endWithJson(game)
         }
         get("/games/:id").handler { ctx ->
             val gameId = GameId(ctx.request().getParam("id"))
