@@ -5,7 +5,7 @@ import kotlin.random.Random.Default.nextInt
 
 interface GameService {
     fun startGame(quizzId: QuizzId): Game
-    fun get(gameId: GameId): Game?
+    fun get(gameId: GameId): Game
     fun update(gameId: GameId, stateChange: StateChange): Game
     fun getHighScore(gameId: GameId, limit: Int): HighScore
 }
@@ -23,16 +23,15 @@ class GameServiceImpl(
             quizz,
             GameState.QUESTION
         )
-        gameStorage[gameId] = game
+        gameStorage[game.id] = game
         return game
     }
 
-    override fun get(gameId: GameId): Game? {
-        return gameStorage[gameId]
-    }
+    override fun get(gameId: GameId): Game =
+        gameStorage[gameId] ?: throw GameNotFoundException("Game for gameId $gameId not found")
 
     override fun update(gameId: GameId, stateChange: StateChange): Game {
-        val game = get(gameId) ?: throw GameNotFoundException("Game for gameId $gameId not found")
+        val game = get(gameId)
         if (game.quizz.questions.none { it.id == stateChange.questionId }) {
             throw GameUpdateException("Question ${stateChange.questionId} does not belong to this game")
         }
@@ -42,7 +41,7 @@ class GameServiceImpl(
     }
 
     override fun getHighScore(gameId: GameId, limit: Int): HighScore {
-        get(gameId) ?: throw GameNotFoundException("Game with id $gameId doesn't exist")
+        get(gameId)
         return HighScore(List(limit) { PlayerScore(nextId(), nextInt(100)) }.sortedBy { it.score }.reversed())
     }
 }

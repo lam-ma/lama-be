@@ -34,11 +34,7 @@ class HttpApi(
         get("/games/:id").handler { ctx ->
             val gameId = GameId(ctx.request().getParam("id"))
             val game = gameService.get(gameId)
-            if (game == null) {
-                throw GameNotFoundException("Game not found")
-            } else {
-                ctx.response().endWithJson(game)
-            }
+            ctx.response().endWithJson(game)
         }
         post("/games/:id").handler { ctx ->
             val gameId = GameId(ctx.request().getParam("id"))
