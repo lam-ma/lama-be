@@ -51,6 +51,11 @@ data class Game(
     val state: GameState
 )
 
+data class StateChange(
+    val questionId: QuestionId,
+    val state: GameState
+)
+
 enum class GameState {
     QUESTION,
     ANSWER,
@@ -60,3 +65,5 @@ enum class GameState {
 class QuizzNotFoundException(message: String) : RuntimeException(message)
 
 class GameNotFoundException(message: String): RuntimeException(message)
+
+class GameUpdateException(message: String): RuntimeException(message)

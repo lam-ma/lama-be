@@ -2,11 +2,14 @@ package com.lama.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.lama.GameNotFoundException
+import com.lama.GameUpdateException
 import com.lama.QuizzNotFoundException
 import io.vertx.core.Vertx
 import io.vertx.core.http.HttpServerResponse
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
+import io.vertx.ext.web.handler.BodyHandler
 import mu.KLogging
 
 abstract class HttpApiBase(
@@ -18,6 +21,7 @@ abstract class HttpApiBase(
 
     fun createApi(): Router {
         val router = Router.router(vertx).installErrorHandler()
+        router.route().handler(BodyHandler.create(false))
         router.route().handler {
             it.response().putHeader("Access-Control-Allow-Origin", "*")
             it.next()
@@ -47,6 +51,8 @@ abstract class HttpApiBase(
             val exception = ctx.failure()
             val (status, detail) = when (exception) {
                 is QuizzNotFoundException -> HttpStatus.NOT_FOUND to exception.message
+                is GameNotFoundException -> HttpStatus.NOT_FOUND to exception.message
+                is GameUpdateException -> HttpStatus.UNPROCESSABLE_ENTITY to exception.message
                 else -> HttpStatus.INTERNAL_SERVER_ERROR to null
             }
             if (status in CLIENT_ERROR_STATUSES) {

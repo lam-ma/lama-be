@@ -5,6 +5,7 @@ import com.lama.web.HttpApiBase
 import io.vertx.core.Vertx
 import io.vertx.ext.web.Router
 
+
 class HttpApi(
     vertx: Vertx,
     mapper: ObjectMapper,
@@ -38,6 +39,12 @@ class HttpApi(
             } else {
                 ctx.response().endWithJson(game)
             }
+        }
+        post("/games/:id").handler { ctx ->
+            val gameId = GameId(ctx.request().getParam("id"))
+            val stateChange = ctx.bodyAs<StateChange>()
+            val updatedGame = gameService.update(gameId, stateChange)
+            ctx.response().endWithJson(updatedGame)
         }
     }
 }

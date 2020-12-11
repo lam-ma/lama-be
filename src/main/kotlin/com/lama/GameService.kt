@@ -5,12 +5,13 @@ import kotlin.random.Random
 interface GameService {
     fun startGame(quizzId: QuizzId): GameId
     fun get(gameId: GameId): Game?
+    fun update(gameId: GameId, stateChange: StateChange): Game
 }
 
 class GameServiceImpl(
-    val quizzService: QuizzService
+    private val quizzService: QuizzService
 ) : GameService {
-    private val gameStorage = mutableMapOf<Game, QuizzId>()
+    private val gameStorage = mutableMapOf<GameId, Game>()
 
     override fun startGame(quizzId: QuizzId): GameId {
         val quizz = quizzService.get(quizzId)
@@ -22,11 +23,21 @@ class GameServiceImpl(
             quizz,
             GameState.QUESTION
         )
-        gameStorage[game] = quizzId
+        gameStorage[gameId] = game
         return gameId
     }
 
     override fun get(gameId: GameId): Game? {
-        return gameStorage.filterKeys { it.id == gameId }.keys.firstOrNull()
+        return gameStorage[gameId]
+    }
+
+    override fun update(gameId: GameId, stateChange: StateChange): Game {
+        val game = get(gameId) ?: throw GameNotFoundException("Game for gameId $gameId not found")
+        if (game.quizz.questions.none { it.id == stateChange.questionId }) {
+            throw GameUpdateException("Question ${stateChange.questionId} does not belong to this game")
+        }
+        val updatedGame = game.copy(currentQuestionId = stateChange.questionId, state = stateChange.state)
+        gameStorage[gameId] = updatedGame
+        return updatedGame
     }
 }

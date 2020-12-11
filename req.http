@@ -1,4 +1,13 @@
-GET http://localhost:8080/games/1a8bfd58
+POST http://localhost:8080/games/6eae3c95
+Content-Type: application/json
+
+{
+  "question_id": "qid_2",
+  "state": "ANSWER"
+}
+
+###
+GET http://localhost:8080/games/6eae3c95
 
 ###
 POST http://localhost:8080/quizzes/123/start
@@ -11,4 +20,4 @@ GET http://localhost:8080/quizzes/123
 
 ###
 
-GET https://lama-api.kvarto.net/quizzes/123
+GET https://lama-api.kvarto.net/quizzes/123/start
