@@ -1,0 +1,59 @@
+{
+  "id": "queeze_id_1",
+  "title": "Some title",
+  "questions": [
+    {
+      "id": "question_id_1",
+      "description": "Who is EM of MKP-2?",
+      "image_url": "https://www.jochen-schweizer.de/on/demandware.static/-/Sites-Class/default/dwdf47d577/products/extragross/lama-trekking-1.jpg",
+      "answers": [
+        {
+          "id": "answer_id_1",
+          "description": "Aviv Sharked",
+          "is_right": true
+        },
+        {
+          "id": "answer_id_2",
+          "description": "Marta",
+          "is_right": false
+        },
+        {
+          "id": "answer_id_3",
+          "description": "Misha",
+          "is_right": false
+        },
+        {
+          "id": "answer_id_4",
+          "description": "Lukasz",
+          "is_right": false
+        }
+      ]
+    },
+    {
+      "id": "question_id_2",
+      "description": "What about order?",
+      "answers": [
+        {
+          "id": "answer_id_1",
+          "description": "IDK random",
+          "is_right": false
+        },
+        {
+          "id": "answer_id_2",
+          "description": "Some other answer",
+          "is_right": false
+        },
+        {
+          "id": "answer_id_3",
+          "description": "BLah",
+          "is_right": true
+        },
+        {
+          "id": "answer_id_4",
+          "description": "Right answer #2",
+          "is_right": true
+        }
+      ]
+    }
+  ]
+}
