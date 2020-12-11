@@ -1,1 +1,7 @@
+POST http://localhost:8080/quizzes/123/start
+Content-Type: application/json
+
+{}
+
+###
 GET http://localhost:8080/quizzes/123

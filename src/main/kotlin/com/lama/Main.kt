@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -17,7 +18,8 @@ suspend fun main() {
     val vertx = Vertx.vertx()
     val mapper = createObjectMapper()
     val quizzService = QuizzServiceImpl()
-    val httpApi = HttpApi(vertx, quizzService, mapper)
+    val gameService = GameServiceImpl()
+    val httpApi = HttpApi(vertx, quizzService, gameService, mapper)
     vertx.createHttpServer().requestHandler(httpApi.createApi()).listen(port).await()
     println("Server started at http://0.0.0.0:$port")
 }
@@ -25,6 +27,7 @@ suspend fun main() {
 fun createObjectMapper(): ObjectMapper =
     ObjectMapper()
         .registerModule(KotlinModule())
+        .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)

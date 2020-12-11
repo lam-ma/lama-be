@@ -1,13 +1,16 @@
 package com.lama
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.vertx.core.Vertx
 import io.vertx.core.http.HttpServerResponse
 import io.vertx.ext.web.Router
+import io.vertx.ext.web.RoutingContext
 
 class HttpApi(
     val vertx: Vertx,
     val quizzService: QuizzService,
+    val gameService: GameService,
     val mapper: ObjectMapper
 ) {
     fun createApi(): Router {
@@ -25,8 +28,13 @@ class HttpApi(
             if (quizz != null) {
                 ctx.response().endWithJson(quizz)
             } else {
-                ctx.response().setStatusCode(404)
+                ctx.response().statusCode = 404
             }
+        }
+        router.post("/quizzes/:id/start").handler { ctx ->
+            val quizzId = QuizzId(ctx.request().getParam("id"))
+            val gameId = gameService.startGame(quizzId)
+            ctx.response().endWithJson(GameIdResponse(gameId))
         }
         return router
     }
@@ -34,5 +42,12 @@ class HttpApi(
     private fun HttpServerResponse.endWithJson(body: Any) {
         putHeader("Content-Type", "application/json").end(mapper.writeValueAsString(body))
     }
+
+    private inline fun <reified T> RoutingContext.bodyAs(): T =
+        runCatching {
+            mapper.readValue<T>(bodyAsString)
+        }.getOrElse {
+            throw IllegalArgumentException("Can't parse request body: ${it.message}")
+        }
 }
 
