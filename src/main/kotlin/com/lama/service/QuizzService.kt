@@ -1,5 +1,6 @@
 package com.lama
 
+import com.lama.domain.QuizzNotFoundException
 import java.net.URL
 
 interface QuizzService {

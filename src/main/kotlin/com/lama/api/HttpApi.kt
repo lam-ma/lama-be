@@ -1,8 +1,15 @@
-package com.lama
+package com.lama.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.lama.web.HttpApiBase
-import com.lama.web.HttpStatus
+import com.lama.CreateQuizzDto
+import com.lama.GameId
+import com.lama.GameService
+import com.lama.QuizzId
+import com.lama.QuizzService
+import com.lama.StateChange
+import com.lama.http.HttpApiBase
+import com.lama.http.HttpStatus
+import com.lama.picUrl
 import io.vertx.core.Vertx
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext

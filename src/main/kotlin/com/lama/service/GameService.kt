@@ -1,5 +1,7 @@
 package com.lama
 
+import com.lama.domain.GameNotFoundException
+import com.lama.domain.GameUpdateException
 import java.lang.Integer.toHexString
 import kotlin.random.Random.Default.nextInt
 

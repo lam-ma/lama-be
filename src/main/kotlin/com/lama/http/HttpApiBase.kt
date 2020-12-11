@@ -1,10 +1,10 @@
-package com.lama.web
+package com.lama.http
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.lama.GameNotFoundException
-import com.lama.GameUpdateException
-import com.lama.QuizzNotFoundException
+import com.lama.domain.GameNotFoundException
+import com.lama.domain.GameUpdateException
+import com.lama.domain.QuizzNotFoundException
 import io.vertx.core.Vertx
 import io.vertx.core.http.HttpServerResponse
 import io.vertx.ext.web.Router

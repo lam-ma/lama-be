@@ -1,4 +1,4 @@
-package com.lama.web
+package com.lama.http
 
 @Suppress("MagicNumber")
 enum class HttpStatus(val code: Int) {
