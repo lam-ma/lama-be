@@ -27,8 +27,8 @@ class HttpApi(
         }
         post("/quizzes/:id/start").handler { ctx ->
             val quizzId = QuizzId(ctx.request().getParam("id"))
-            val gameId = gameService.startGame(quizzId)
-            ctx.response().endWithJson(GameIdResponse(gameId))
+            val game = gameService.startGame(quizzId)
+            ctx.response().endWithJson(game)
         }
         get("/games/:id").handler { ctx ->
             val gameId = GameId(ctx.request().getParam("id"))

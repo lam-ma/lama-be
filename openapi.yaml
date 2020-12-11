@@ -49,7 +49,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StartGameResponse"
+                $ref: "#/components/schemas/Game"
         default:
           description: unexpected error
           content:
@@ -190,14 +190,6 @@ components:
           type: string
         is_right:
           type: boolean
-
-    StartGameResponse:
-      type: object
-      required:
-        - game_id
-      properties:
-        game_id:
-          type: string
 
     Game:
       type: object
