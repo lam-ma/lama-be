@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.lama.api.HttpApi
+import com.lama.api.WsApi
 import io.vertx.core.Vertx
 import io.vertx.kotlin.coroutines.await
 
@@ -21,8 +22,14 @@ suspend fun main() {
     val quizzService = QuizzServiceImpl()
     val gameService = GameServiceImpl(quizzService)
     val httpApi = HttpApi(vertx, mapper, quizzService, gameService)
-    vertx.createHttpServer().requestHandler(httpApi.createApi()).listen(port).await()
-    println("Server started at http://0.0.0.0:$port")
+    val wsApi = WsApi()
+    vertx.createHttpServer()
+        .requestHandler(httpApi.createApi())
+        .webSocketHandler(wsApi::handle)
+        .exceptionHandler { it.printStackTrace() }
+        .listen(port)
+        .await()
+    println("Server started at http://localhost:$port")
 }
 
 fun createObjectMapper(): ObjectMapper =

@@ -67,6 +67,27 @@ class HttpApi(
             val score = gameService.getHighScore(gameId, limit)
             ctx.response().endWithJson(score)
         }
+        get("/ws").handler {
+            val payload = """
+                <script>
+                    var socket = new WebSocket("ws://localhost:8080")
+    
+                    socket.onmessage = function(event) {
+                        alert("Received data from websocket: " + event.data)
+                    }
+    
+                    socket.onopen = function(event) {
+                        alert("Web Socket opened")
+                        socket.send("Blah")
+                    }
+    
+                    socket.onclose = function(event) {
+                        alert("Web Socket closed")
+                    }
+                </script>
+            """
+            it.response().putHeader("content-type", "text/html").end(payload)
+        }
     }
 
     private fun RoutingContext.getGameId() = GameId(request().getParam("id"))
