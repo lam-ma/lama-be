@@ -1,9 +1,11 @@
 package com.lama
 
+import java.lang.Integer.toHexString
 import kotlin.random.Random
+import kotlin.random.Random.Default.nextInt
 
 interface GameService {
-    fun startGame(quizzId: QuizzId): GameId
+    fun startGame(quizzId: QuizzId): Game
     fun get(gameId: GameId): Game?
     fun update(gameId: GameId, stateChange: StateChange): Game
 }
@@ -13,18 +15,16 @@ class GameServiceImpl(
 ) : GameService {
     private val gameStorage = mutableMapOf<GameId, Game>()
 
-    override fun startGame(quizzId: QuizzId): GameId {
+    override fun startGame(quizzId: QuizzId): Game {
         val quizz = quizzService.get(quizzId)
-
-        val gameId = GameId(Integer.toHexString(Random.nextInt()).toString())
         val game = Game(
-            gameId,
+            GameId(nextId()),
             quizz.questions.first().id,
             quizz,
             GameState.QUESTION
         )
         gameStorage[gameId] = game
-        return gameId
+        return game
     }
 
     override fun get(gameId: GameId): Game? {
@@ -41,3 +41,5 @@ class GameServiceImpl(
         return updatedGame
     }
 }
+
+fun nextId(): String = toHexString(nextInt()).toString()

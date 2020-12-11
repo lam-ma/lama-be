@@ -21,10 +21,6 @@ data class GameId @JsonCreator(mode = embed) constructor(@JsonValue val value: S
     override fun toString() = value
 }
 
-data class GameIdResponse(
-    val gameId: GameId
-)
-
 data class Quizz(
     val id: QuizzId,
     val title: String,
