@@ -28,12 +28,12 @@ class GameServiceImpl(
     }
 
     override fun get(gameId: GameId): Game =
-        gameStorage[gameId] ?: throw GameNotFoundException("Game for gameId $gameId not found")
+        gameStorage[gameId] ?: throw GameNotFoundException(gameId)
 
     override fun update(gameId: GameId, stateChange: StateChange): Game {
         val game = get(gameId)
         if (game.quizz.questions.none { it.id == stateChange.questionId }) {
-            throw GameUpdateException("Question ${stateChange.questionId} does not belong to this game")
+            throw GameUpdateException("Question ${stateChange.questionId} does not belong to game $gameId")
         }
         val updatedGame = game.copy(currentQuestionId = stateChange.questionId, state = stateChange.state)
         gameStorage[gameId] = updatedGame

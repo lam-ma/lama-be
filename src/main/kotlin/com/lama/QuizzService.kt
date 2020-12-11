@@ -9,7 +9,7 @@ interface QuizzService {
 class QuizzServiceImpl : QuizzService {
     override fun get(id: QuizzId): Quizz {
         if (id != SAMPLE_QUIZZ.id) {
-            throw QuizzNotFoundException("Quizz with $id not found")
+            throw QuizzNotFoundException(id)
         }
         return SAMPLE_QUIZZ
     }

@@ -67,8 +67,8 @@ enum class GameState {
     FINISH
 }
 
-class QuizzNotFoundException(message: String) : RuntimeException(message)
+class QuizzNotFoundException(id: QuizzId) : RuntimeException("Quizz with $id not found")
 
-class GameNotFoundException(message: String): RuntimeException(message)
+class GameNotFoundException(id: GameId): RuntimeException("Game for gameId $id not found")
 
 class GameUpdateException(message: String): RuntimeException(message)
