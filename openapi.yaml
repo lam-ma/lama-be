@@ -1,0 +1,280 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Lama Backend
+  license:
+    name: MIT
+servers:
+  - url: https://lama-api.kvarto.net
+paths:
+  /quizzes/{id}:
+    get:
+      summary: Get full quizz data
+      operationId: getQuizz
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the quizz to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Full data of single quizz
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quizz"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+
+  /quizzes/{id}/start:
+    post:
+      summary: Start new game with given quizz
+      operationId: startGame
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the quizz for the game
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Game info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartGameResponse"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+
+  /games/{id}:
+    get:
+      summary: Get game data
+      operationId: getGame
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the game
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Full game data including current state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+
+    post:
+      summary: Change game state (for example move to next question)
+      operationId: advanceGame
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the game
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangeGameRequest"
+      responses:
+        '200':
+          description: Full game data including current state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+
+  /games/{id}/scores:
+    get:
+      summary: Get high score for the game
+      operationId: getHighScore
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the game
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: Amount of players to return
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: High score
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HighScore"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+
+components:
+  schemas:
+    Quizz:
+      type: object
+      required:
+        - id
+        - title
+        - questions
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Question"
+    Question:
+      type: object
+      required:
+        - id
+        - title
+        - questions
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+        image_url:
+          type: string
+        answers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Answer"
+
+    Answer:
+      type: object
+      required:
+        - id
+        - title
+        - questions
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+        is_right:
+          type: boolean
+
+    StartGameResponse:
+      type: object
+      required:
+        - game_id
+      properties:
+        game_id:
+          type: string
+
+    Game:
+      type: object
+      required:
+        - id
+        - quizz
+        - state
+      properties:
+        id:
+          type: string
+        current_question_id:
+          type: string
+        quizz:
+          $ref: "#/components/schemas/Quizz"
+        state:
+          $ref: "#/components/schemas/GameState"
+
+    HighScore:
+      type: object
+      required:
+        - scores
+      properties:
+        scores:
+          type: array
+          items:
+            type: object
+            required:
+              - name
+              - score
+            properties:
+              name:
+                type: string
+              score:
+                type: integer
+
+    ChangeGameRequest:
+      type: object
+      required:
+        - question_id
+        - state
+      properties:
+        question_id:
+          type: string
+        state:
+          $ref: "#/components/schemas/GameState"
+
+    GameState:
+      type: string
+      enum:
+        - QUESTION
+        - ANSWER
+        - FINISH
+
+    Problem:
+      type: object
+      properties:
+        title:
+          type: string
+          description: |
+            A short, summary of the problem type. Written in english and readable
+            for engineers (usually not suited for non technical stakeholders and
+            not localized); example: Service Unavailable
+        status:
+          type: integer
+          format: int32
+          description: |
+            The HTTP status code generated by the origin server for this occurrence
+            of the problem.
+          minimum: 100
+          maximum: 600
+          exclusiveMaximum: true
+        detail:
+          type: string
+          description: |
+            A human readable explanation specific to this occurrence of the
+            problem.
+          example: Connection to database timed out
+      required:
+        - title
+        - status

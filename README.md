@@ -2,6 +2,10 @@ Lama Backend
 ==
 Hack week (day?) project
 
+API:
+-
+[OpenApi spec](/openapi.yaml)
+
 Prerequisites:
 -
 Project requires JDK 11+ installed 
