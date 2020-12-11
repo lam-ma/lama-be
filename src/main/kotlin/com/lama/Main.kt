@@ -18,7 +18,7 @@ suspend fun main() {
     val vertx = Vertx.vertx()
     val mapper = createObjectMapper()
     val quizzService = QuizzServiceImpl()
-    val gameService = GameServiceImpl()
+    val gameService = GameServiceImpl(quizzService)
     val httpApi = HttpApi(vertx, quizzService, gameService, mapper)
     vertx.createHttpServer().requestHandler(httpApi.createApi()).listen(port).await()
     println("Server started at http://0.0.0.0:$port")

@@ -3,15 +3,15 @@ package com.lama
 import java.net.URL
 
 interface QuizzService {
-    fun get(id: QuizzId): Quizz?
+    fun get(id: QuizzId): Quizz
 }
 
 class QuizzServiceImpl : QuizzService {
-    override fun get(id: QuizzId): Quizz? {
-        if (id == SAMPLE_QUIZZ.id) {
-            return SAMPLE_QUIZZ
+    override fun get(id: QuizzId): Quizz {
+        if (id != SAMPLE_QUIZZ.id) {
+            throw QuizzNotFoundException("Quizz with $id not found")
         }
-        return null
+        return SAMPLE_QUIZZ
     }
 }
 

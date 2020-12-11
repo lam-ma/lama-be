@@ -43,3 +43,5 @@ data class Answer(
     val description: String,
     val isRight: Boolean
 )
+
+class QuizzNotFoundException(message: String) : RuntimeException(message)
