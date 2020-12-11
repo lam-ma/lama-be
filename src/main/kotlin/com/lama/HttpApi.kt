@@ -12,6 +12,10 @@ class HttpApi(
 ) {
     fun createApi(): Router {
         val router = Router.router(vertx)
+        router.route().handler {
+            it.response().putHeader("Access-Control-Allow-Origin", "*")
+            it.next()
+        }
         router.get("/").handler { ctx ->
             val body = """<html><body><img src="$picUrl" style="height: 100%"/></body></html>"""
             ctx.response().putHeader("content-type", "text/html").end(body)

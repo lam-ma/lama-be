@@ -1,1 +1,5 @@
 GET http://localhost:8080/quizzes/123
+
+###
+
+GET https://lama-api.kvarto.net/quizzes/123
