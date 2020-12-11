@@ -70,7 +70,7 @@ class HttpApi(
         get("/ws").handler {
             val payload = """
                 <script>
-                    var socket = new WebSocket("ws://localhost:8080")
+                    var socket = new WebSocket("wss://lama-api.kvarto.net")
     
                     socket.onmessage = function(event) {
                         alert("Received data from websocket: " + event.data)
