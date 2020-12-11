@@ -47,6 +47,11 @@ data class Game(
     val state: GameState
 )
 
+data class StateChange(
+    val questionId: QuestionId,
+    val state: GameState
+)
+
 data class HighScore(
     val scores: List<PlayerScore>
 )
@@ -65,3 +70,5 @@ enum class GameState {
 class QuizzNotFoundException(message: String) : RuntimeException(message)
 
 class GameNotFoundException(message: String): RuntimeException(message)
+
+class GameUpdateException(message: String): RuntimeException(message)
