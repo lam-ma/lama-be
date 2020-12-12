@@ -1,6 +1,7 @@
 package com.lama
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonValue
 import java.net.URL
 import com.fasterxml.jackson.annotation.JsonCreator.Mode.DELEGATING as embed
@@ -18,6 +19,10 @@ data class AnswerId @JsonCreator(mode = embed) constructor(@JsonValue val value:
 }
 
 data class GameId @JsonCreator(mode = embed) constructor(@JsonValue val value: String) {
+    override fun toString() = value
+}
+
+data class PlayerId @JsonCreator(mode = JsonCreator.Mode.DELEGATING) constructor(@JsonValue val value: String) {
     override fun toString() = value
 }
 
@@ -47,9 +52,11 @@ data class Answer(
 
 data class Game(
     val id: GameId,
-    val currentQuestionId: QuestionId,
     val quizz: Quizz,
-    val state: GameState
+    var currentQuestionId: QuestionId,
+    var state: GameState,
+    @JsonIgnore //TODO: make GameDto
+    val playerIds: MutableSet<PlayerId> = LinkedHashSet()
 )
 
 data class StateChange(

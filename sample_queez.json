@@ -1,56 +1,212 @@
 {
   "id": "queeze_id_1",
-  "title": "Some title",
+  "title": "Kartoffelsalat party",
   "questions": [
     {
       "id": "question_id_1",
-      "description": "Who is EM of MKP-2?",
-      "image_url": "https://www.jochen-schweizer.de/on/demandware.static/-/Sites-Class/default/dwdf47d577/products/extragross/lama-trekking-1.jpg",
+      "description": "You want to go down and transport a very heavy sofa from the Amazon logistics storage in Berlin. You enter the hall and you take...",
+      "image_url": "",
       "answers": [
         {
           "id": "answer_id_1",
-          "description": "Aviv Sharked",
+          "description": "Paternoster",
           "is_right": true
         },
         {
           "id": "answer_id_2",
-          "description": "Marta",
+          "description": "Hosenträger",
           "is_right": false
         },
         {
           "id": "answer_id_3",
-          "description": "Misha",
+          "description": "Dampfwalze",
           "is_right": false
         },
         {
           "id": "answer_id_4",
-          "description": "Lukasz",
+          "description": "Briefkastenschlitz",
           "is_right": false
         }
       ]
     },
     {
       "id": "question_id_2",
-      "description": "What about order?",
+      "description": "Sofa and you made it magically home. You want to have a housewarming party in the 80s vibes. Who can you arrange to be an epic DJ?",
       "answers": [
         {
           "id": "answer_id_1",
-          "description": "IDK random",
+          "description": "Corina",
           "is_right": false
         },
         {
           "id": "answer_id_2",
-          "description": "Some other answer",
+          "description": "Zorro",
           "is_right": false
         },
         {
           "id": "answer_id_3",
-          "description": "BLah",
+          "description": "Avivo Sharaked",
           "is_right": true
         },
         {
           "id": "answer_id_4",
-          "description": "Right answer #2",
+          "description": "Master Mind Herbie",
+          "is_right": true
+        }
+      ]
+    },
+    {
+      "id": "question_id_3",
+      "description": "The first guests are arriving and you still need to finish cooking a dip sauce. By accident you burnt your finger over a hot sauce frying pan. You scream:",
+      "answers": [
+        {
+          "id": "answer_id_1",
+          "description": "Mist! Diese Pferdekutsche!",
+          "is_right": false
+        },
+        {
+          "id": "answer_id_2",
+          "description": "Verdammte Dampfwalze, das ist ja Wahnsinn!",
+          "is_right": false
+        },
+        {
+          "id": "answer_id_3",
+          "description": "Scheisse Kasserolle!",
+          "is_right": true
+        },
+        {
+          "id": "answer_id_4",
+          "description": "Das Bier schmeckt ja gut!",
+          "is_right": true
+        }
+      ]
+    },
+    {
+      "id": "question_id_4",
+      "description": "Avivo Sharaked and Master Mind Herbie start playing their welcome set. Your Salsa Dip is ready and you are feeling the groove. What is your next dance move? ",
+      "answers": [
+        {
+          "id": "answer_id_1",
+          "description": "Schuhplattler",
+          "is_right": false
+        },
+        {
+          "id": "answer_id_2",
+          "description": "Haende hoch!",
+          "is_right": false
+        },
+        {
+          "id": "answer_id_3",
+          "description": "I will simply open my Bier with another Bier bottle!",
+          "is_right": true
+        },
+        {
+          "id": "answer_id_4",
+          "description": "Hahohe Hertha BSC!",
+          "is_right": true
+        }
+      ]
+    },
+    {
+      "id": "question_id_5",
+      "description": "Oh nein! Es gibt ein Problem! Somebody is trying to crash your secret party and looks very touristy. You stand in your all black outfit and see that the gatekeeper is...   ",
+      "answers": [
+        {
+          "id": "answer_id_1",
+          "description": "Eating Pringles with the newcomer.",
+          "is_right": false
+        },
+        {
+          "id": "answer_id_2",
+          "description": "Giving directions to Goerli",
+          "is_right": false
+        },
+        {
+          "id": "answer_id_3",
+          "description": "Setting up a Schwitzkasten",
+          "is_right": true
+        },
+        {
+          "id": "answer_id_4",
+          "description": "Singing joyfully “Don’t Stop Belivin’” by Journey!",
+          "is_right": false
+        }
+      ]
+    },
+    {
+      "id": "question_id_6",
+      "description": "Moscow mule and Jager Bomb feel good, room is changing colors. Suddenly, you hear the well known refrain “Atemlos durch die Nacht” made by this beautiful Schlager singer. Who is she? ",
+      "answers": [
+        {
+          "id": "answer_id_1",
+          "description": "Angie",
+          "is_right": false
+        },
+        {
+          "id": "answer_id_2",
+          "description": "Helene Fischer",
+          "is_right": true
+        },
+        {
+          "id": "answer_id_3",
+          "description": "One of the Kardashians!",
+          "is_right": false
+        },
+        {
+          "id": "answer_id_4",
+          "description": "Nena",
+          "is_right": false
+        }
+      ]
+    },
+    {
+      "id": "question_id_7",
+      "description": "It’s close to 2 a.m. Jonas is screaming “Time to hit the Mensch Meier club!” Your friends and you leave the flat and take a …..  ",
+      "answers": [
+        {
+          "id": "answer_id_1",
+          "description": "Windschutzjacke",
+          "is_right": false
+        },
+        {
+          "id": "answer_id_2",
+          "description": "Apfelschorle.",
+          "is_right": false
+        },
+        {
+          "id": "answer_id_3",
+          "description": "Platform shoes.",
+          "is_right": false
+        },
+        {
+          "id": "answer_id_4",
+          "description": "Weg Bier!",
+          "is_right": true
+        }
+      ]
+    },
+    {
+      "id": "question_id_8",
+      "description": "Dancefloor was pretty dope. So does the chillin area. Suddenly you find yourself dozing on a couch and Heidi Klum or Til Schweiger say….   ",
+      "answers": [
+        {
+          "id": "answer_id_1",
+          "description": "Morgen mein Schaetzen!",
+          "is_right": true
+        },
+        {
+          "id": "answer_id_2",
+          "description": "Traum schoen!",
+          "is_right": true
+        },
+        {
+          "id": "answer_id_3",
+          "description": "Na, gut geschlafen?",
+          "is_right": true
+        },
+        {
+          "id": "answer_id_4",
+          "description": "Gute Nacht!",
           "is_right": true
         }
       ]

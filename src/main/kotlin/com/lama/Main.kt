@@ -20,9 +20,10 @@ suspend fun main() {
     val vertx = Vertx.vertx()
     val mapper = createObjectMapper()
     val quizzService = QuizzServiceImpl()
-    val gameService = GameServiceImpl(quizzService)
+    val wsApi = WsApi(mapper)
+    val gameService = GameServiceImpl(quizzService, wsApi)
+    wsApi.gameService = gameService
     val httpApi = HttpApi(vertx, mapper, quizzService, gameService)
-    val wsApi = WsApi()
     vertx.createHttpServer()
         .requestHandler(httpApi.createApi())
         .webSocketHandler(wsApi::handle)

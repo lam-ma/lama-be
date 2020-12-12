@@ -7,18 +7,18 @@ Content-Type: application/json
 {}
 
 ###
-GET http://localhost:8080/games/536a3a85
+GET http://localhost:8080/games/a1274d1b
 
 ###
-GET http://localhost:8080/games/536a3a85/scores
+GET http://localhost:8080/games/a1274d1b/scores
 
 ###
-POST http://localhost:8080/games/536a3a85
+POST http://localhost:8080/games/a1274d1b
 Content-Type: application/json
 
 {
   "question_id": "qid_2",
-  "state": "ANSWER"
+  "state": "FINISH"
 }
 
 ###
