@@ -2,11 +2,14 @@ package com.lama.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.lama.AnswerId
 import com.lama.Game
+import com.lama.GameId
 import com.lama.GameService
 import com.lama.GameState
 import com.lama.Player
 import com.lama.PlayerId
+import com.lama.QuestionId
 import com.lama.domain.ClientCommand
 import com.lama.domain.FinishMessage
 import com.lama.domain.JoinGameCommand
@@ -44,8 +47,14 @@ class WsApi(
 
     private fun handleClientCommand(msg: String, playerId: PlayerId) {
         logger.info("Got $msg from $playerId")
-        val command = mapper.readValue<ClientCommand>(msg)
+        val json = mapper.readTree(msg)
+        val command = when (json["type"].asText()) {
+            "join_game" -> JoinGameCommand(json["name"].asText(), GameId(json["game_id"].asText()))
+            "pick_answer" -> PickAnswerCommand(QuestionId(json["question_id"].asText()), AnswerId(json["answer_id"].asText()))
+            else -> null
+        }
         when (command) {
+            null -> logger.warn("Unknown command: $msg")
             is JoinGameCommand -> gameService.joinGame(command.gameId, playerId, command.name)
             is PickAnswerCommand -> gameService.pickAnswer(playerId, command.questionId, command.answerId)
         }
