@@ -47,17 +47,25 @@ class WsApi(
 
     private fun handleClientCommand(msg: String, playerId: PlayerId) {
         logger.info("Got $msg from $playerId")
-        val json = mapper.readTree(msg)
-        val command = when (json["type"].asText()) {
-            "join_game" -> JoinGameCommand(json["name"].asText(), GameId(json["game_id"].asText()))
-            "pick_answer" -> PickAnswerCommand(QuestionId(json["question_id"].asText()), AnswerId(json["answer_id"].asText()))
-            else -> null
-        }
+        val command = parseClientCommand(msg)
         when (command) {
             null -> logger.warn("Unknown command: $msg")
             is JoinGameCommand -> gameService.joinGame(command.gameId, playerId, command.name)
             is PickAnswerCommand -> gameService.pickAnswer(playerId, command.questionId, command.answerId)
         }
+    }
+
+    private fun parseClientCommand(msg: String): ClientCommand? {
+        val json = mapper.readTree(msg)
+        val command = when (json["type"].asText()) {
+            "join_game" -> JoinGameCommand(json["name"].asText(), GameId(json["game_id"].asText()))
+            "pick_answer" -> PickAnswerCommand(
+                QuestionId(json["question_id"].asText()),
+                AnswerId(json["answer_id"].asText())
+            )
+            else -> null
+        }
+        return command
     }
 
     override fun stateChanged(game: Game, players: List<Player>) {

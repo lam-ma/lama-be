@@ -39,20 +39,21 @@ class GameServiceImpl(
         if (game.quizz.questions.none { it.id == stateChange.questionId }) {
             throw GameUpdateException("Question ${stateChange.questionId} does not belong to game $gameId")
         }
-        val oldQuestion = stateChange.questionId
-        val oldState = game.state
         game.currentQuestionId = stateChange.questionId
         game.state = stateChange.state
-        // TODO: increment score
 
-        gameStateListener.stateChanged(game, game.playerIds.map { playersStorage[it]!! })
+        gameStateListener.stateChanged(game, game.playerIds.mapNotNull { playersStorage[it] })
         //        TODO: clean up the game after finish
         return game
     }
 
     override fun getHighScore(gameId: GameId, limit: Int): HighScore {
-        get(gameId)
-        return HighScore(List(limit) { PlayerScore(nextId(), nextInt(100)) }.sortedBy { it.score }.reversed())
+        val top = get(gameId).playerIds
+            .mapNotNull(playersStorage::get)
+            .sortedByDescending { it.score }
+            .take(limit)
+            .map { PlayerScore(it.name, it.score) }
+        return HighScore(top)
     }
 
     override fun joinGame(gameId: GameId, playerId: PlayerId, name: String) {
@@ -61,7 +62,7 @@ class GameServiceImpl(
         game.playerIds += playerId
         playersStorage[playerId] = newPlayer
         gameStateListener.stateChanged(game, listOf(newPlayer))
-//        TODO: handle error
+//        TODO: handle errors
     }
 
     override fun leaveGame(playerId: PlayerId) {
@@ -73,8 +74,14 @@ class GameServiceImpl(
         val player = playersStorage[playerId]!!
         player.lastQuestionId = questionId
         player.lastAnswerId = answerId
+        val currentQuestion = get(player.gameId).getCurrentQuestion()
+        if (questionId == currentQuestion.id && currentQuestion.isRight(answerId)) {
+            player.score++
+        }
     }
 }
+
+private fun Question.isRight(answerId: AnswerId): Boolean = answers.find { it.id == answerId }?.isRight ?: false
 
 fun nextId(): String = toHexString(nextInt()).toString()
 
