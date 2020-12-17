@@ -57,7 +57,20 @@ class IntegrationTest {
 
     @Test
     fun `create and update game via rest`() = runBlocking<Unit> {
+        val response = httpClient.post(port, "localhost", "/quizzes").sendBuffer(Buffer.buffer(quizzJson)).await()
+        val quizzId = mapper.readTree(response.body().toString()).extract<String>("$.id")
 
+        val response2 = httpClient.post(port, "localhost", "/quizzes/$quizzId/start").send().await()
+        assertThat(response2.statusCode()).isEqualTo(201)
+        val gameBody = mapper.readTree(response2.body().toString())
+        val gameId = gameBody.extract<String>("$.id")
+        assertThatJson(gameBody).hasProperty("$.state", "QUESTION")
+        assertThatJson(gameBody).hasProperty("$.quizz.id", quizzId)
+        assertThatJson(gameBody).hasProperty("$.current_question_id", "q1")
+
+        val response3 = httpClient.get(port, "localhost", "/games/$gameId").send().await()
+        assertThat(response3.statusCode()).isEqualTo(200)
+        assertThat(response3.body().toString()).isEqualTo(response2.body().toString())
     }
 
     @Test

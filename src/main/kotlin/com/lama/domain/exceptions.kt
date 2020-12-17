@@ -8,3 +8,5 @@ class QuizzNotFoundException(id: QuizzId) : RuntimeException("Quizz with $id not
 class GameNotFoundException(id: GameId): RuntimeException("Game for gameId $id not found")
 
 class GameUpdateException(message: String): RuntimeException(message)
+
+class InvalidInputException(message: String): RuntimeException(message)

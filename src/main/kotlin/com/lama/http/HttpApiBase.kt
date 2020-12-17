@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.lama.domain.GameNotFoundException
 import com.lama.domain.GameUpdateException
+import com.lama.domain.InvalidInputException
 import com.lama.domain.QuizzNotFoundException
 import io.vertx.core.Vertx
 import io.vertx.core.http.HttpServerResponse
@@ -36,9 +37,9 @@ abstract class HttpApiBase(
 
     inline fun <reified T> RoutingContext.bodyAs(): T =
         runCatching {
-            mapper.readValue<T>(bodyAsString)
+            mapper.readValue<T>(bodyAsString.orEmpty())
         }.getOrElse {
-            throw IllegalArgumentException("Can't parse request body: ${it.message}")
+            throw InvalidInputException("Can't parse request body: ${it.message}")
         }
 
     fun RoutingContext.sendError(status: HttpStatus, detail: String? = null) {
@@ -53,6 +54,7 @@ abstract class HttpApiBase(
                 is QuizzNotFoundException -> HttpStatus.NOT_FOUND to exception.message
                 is GameNotFoundException -> HttpStatus.NOT_FOUND to exception.message
                 is GameUpdateException -> HttpStatus.UNPROCESSABLE_ENTITY to exception.message
+                is InvalidInputException -> HttpStatus.BAD_REQUEST to exception.message
                 else -> HttpStatus.INTERNAL_SERVER_ERROR to null
             }
             if (status in CLIENT_ERROR_STATUSES) {
