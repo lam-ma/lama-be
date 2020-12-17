@@ -45,4 +45,4 @@ Host ws exchange:
 1. server:  {"type": "login", "id": "ef73bbf"}
 2. client: {"type": "create_game", "quizz_id": "123"}
 3. server:  {"type": "game_state", ...} // same as for player
-4. server:  {"type": "player_joined", "id": "blah", "name": "Leslye"} 
+4. server:  {"type": "player_joined", "id": "blah", "name": "Leslye", "total_players": 10} 

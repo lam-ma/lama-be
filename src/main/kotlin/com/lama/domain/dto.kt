@@ -21,7 +21,11 @@ data class GameStateMessage(
     val selectedAnswerId: AnswerId?
 ) : ServerMessage("game_state")
 
-data class PlayerJoinedMessage(val id: PlayerId, val name: String) : ServerMessage("player_joined")
+data class PlayerJoinedMessage(
+    val id: PlayerId,
+    val name: String,
+    val totalPlayers: Int
+) : ServerMessage("player_joined")
 
 sealed class ClientCommand
 

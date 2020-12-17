@@ -106,6 +106,7 @@ class IntegrationTest {
         assertThatJson(msg4).hasProperty("$.type", "player_joined")
         assertThatJson(msg4).hasProperty("$.name", "Aviv")
         assertThatJson(msg4).hasProperty("$.id", playerId)
+        assertThatJson(msg4).hasProperty("$.total_players", 1)
 
         val msg5 = playerClient.getMessage()
         assertThatJson(msg5).hasProperty("$.type", "game_state")

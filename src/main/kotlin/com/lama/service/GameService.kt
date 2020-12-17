@@ -102,7 +102,7 @@ class GameServiceImpl(
         playersStorage[playerId] = newPlayer
         playerGateway.send(playerId, getMessage(game, newPlayer))
         if (game.hostId != null) {
-            playerGateway.send(game.hostId, PlayerJoinedMessage(newPlayer.id, newPlayer.name))
+            playerGateway.send(game.hostId, PlayerJoinedMessage(newPlayer.id, newPlayer.name, game.playerIds.size))
         }
 //        TODO: handle errors
     }
