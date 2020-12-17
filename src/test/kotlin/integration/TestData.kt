@@ -29,6 +29,17 @@ val quizzJson = """
               "is_right": true
             }
           ]
+        },
+        {
+          "id": "q2",
+          "description": "Question #2",
+          "answers": [
+            {
+              "id": "a21",
+              "description": "Answer #2_1",
+              "is_right": true
+            }
+          ]
         }
       ]
     }

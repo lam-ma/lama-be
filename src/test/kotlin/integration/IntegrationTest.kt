@@ -27,10 +27,6 @@ class IntegrationTest {
         client.connect()
     }
 
-    @BeforeEach
-    fun cleanUp() {
-    }
-
     @Test
     fun `quizz CRUD`() = runBlocking<Unit> {
         val response = httpClient.post(port, "localhost", "/quizzes").sendBuffer(Buffer.buffer(quizzJson)).await()
@@ -71,10 +67,20 @@ class IntegrationTest {
         val response3 = httpClient.get(port, "localhost", "/games/$gameId").send().await()
         assertThat(response3.statusCode()).isEqualTo(200)
         assertThat(response3.body().toString()).isEqualTo(response2.body().toString())
+
+        val response4 = httpClient
+            .post(port, "localhost", "/games/$gameId")
+            .sendBuffer(Buffer.buffer(mapper.writeValueAsString(mapOf("question_id" to "q2", "state" to "FINISH"))))
+            .await()
+        assertThat(response4.statusCode()).isEqualTo(200)
+        val updatedGame = mapper.readTree(response4.body().toString())
+        assertThatJson(updatedGame).hasProperty("$.id", gameId)
+        assertThatJson(updatedGame).hasProperty("$.current_question_id", "q2")
+        assertThatJson(updatedGame).hasProperty("$.state", "FINISH")
     }
 
     @Test
-    fun `create game via ws`() = runBlocking<Unit> {
+    fun `create and update game via ws`() = runBlocking<Unit> {
         val hostClient = client
         val playerClient = LamaClient(port).apply { connect() }
 
