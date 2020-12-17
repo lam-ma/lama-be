@@ -115,8 +115,9 @@ class IntegrationTest {
         assertThatJson(msg5).hasProperty("$.question.id", "q1")
         assertThatJson(msg5["selected_answer_id"]).isNull()
         assertThatJson(msg5["right_answer_ids"]).isNull()
+        assertThatJson(msg5["scores"]).isNull()
 
-        playerClient.send(mapOf("type" to "pick_answer", "question_id" to "q1", "answer_id" to "a1"))
+        playerClient.send(mapOf("type" to "pick_answer", "question_id" to "q1", "answer_id" to "a2"))
         hostClient.send(
             mapOf("type" to "change_game", "game_id" to gameId, "question_id" to "q1", "state" to "ANSWER")
         )
@@ -126,13 +127,15 @@ class IntegrationTest {
         assertThatJson(msg6).hasProperty("$.game_id", gameId)
         assertThatJson(msg6).hasProperty("$.state", "ANSWER")
         assertThatJson(msg6).hasProperty("$.question.id", "q1")
-        assertThat(msg6["right_answer_ids"].map { it.asText() }).containsExactlyInAnyOrder("a3", "a2")
+        assertThatJson(msg6).hasProperty("$.right_answer_ids[*]", listOf("a2", "a3"))
+        assertThatJson(msg6).hasProperty("$.scores[*].name", listOf("Aviv"))
+        assertThatJson(msg6).hasProperty("$.scores[*].score", listOf(1))
 
         val msg7 = hostClient.getMessage()
         assertThatJson(msg7).hasProperty("$.type", "game_state")
         assertThatJson(msg7).hasProperty("$.game_id", gameId)
         assertThatJson(msg7).hasProperty("$.state", "ANSWER")
         assertThatJson(msg7).hasProperty("$.question.id", "q1")
-        assertThat(msg7["right_answer_ids"].map { it.asText() }).containsExactlyInAnyOrder("a3", "a2")
+        assertThatJson(msg7).hasProperty("$.right_answer_ids[*]", listOf("a2", "a3"))
     }
 }

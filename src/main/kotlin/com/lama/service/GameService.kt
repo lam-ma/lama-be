@@ -13,13 +13,14 @@ import com.lama.domain.PlayerJoinedMessage
 import com.lama.domain.ServerMessage
 import com.lama.service.PlayerGateway
 import java.lang.Integer.toHexString
+import java.util.TreeSet
 import kotlin.random.Random.Default.nextInt
 
 interface GameService {
     fun startGame(quizzId: QuizzId, hostId: PlayerId?): Game
     fun get(gameId: GameId): Game
     fun update(gameId: GameId, stateChange: StateChange): Game
-    fun getHighScore(gameId: GameId, limit: Int): HighScore
+    fun getHighScore(gameId: GameId, limit: Int): List<PlayerScore>
 
     fun handle(playerId: PlayerId, command: ClientCommand)
 }
@@ -30,6 +31,7 @@ class GameServiceImpl(
 ) : GameService {
     private val gameStorage = mutableMapOf<GameId, Game>()
     private val playersStorage = mutableMapOf<PlayerId, Player>()
+    private val highScore = TreeSet(compareByDescending<Pair<Int, PlayerId>> { it.first }.thenBy { it.second.value })
 
     override fun startGame(quizzId: QuizzId, hostId: PlayerId?): Game {
         val quizz = quizzService.get(quizzId)
@@ -71,18 +73,15 @@ class GameServiceImpl(
             game.quizz.title,
             currentQuestion,
             rightAnswerIds.takeIf { game.state == GameState.ANSWER },
-            player?.lastAnswerId
+            player?.lastAnswerId,
+            getHighScore(game.id, 10).takeIf { game.state == GameState.ANSWER }
         )
     }
 
-    override fun getHighScore(gameId: GameId, limit: Int): HighScore {
-        val top = get(gameId).playerIds
-            .mapNotNull(playersStorage::get)
-            .sortedByDescending { it.score }
-            .take(limit)
-            .map { PlayerScore(it.name, it.score) }
-        return HighScore(top)
-    }
+    override fun getHighScore(gameId: GameId, limit: Int): List<PlayerScore> =
+        highScore.take(limit).map { (score, id) ->
+            PlayerScore(playersStorage[id]?.name.orEmpty(), score)
+        }
 
     @Suppress("IMPLICIT_CAST_TO_ANY")
     override fun handle(playerId: PlayerId, command: ClientCommand) {
@@ -99,6 +98,7 @@ class GameServiceImpl(
         val game = get(gameId)
         val newPlayer = Player(playerId, name, gameId, 0, null, null)
         game.playerIds += playerId
+        highScore += newPlayer.score to playerId
         playersStorage[playerId] = newPlayer
         playerGateway.send(playerId, getMessage(game, newPlayer))
         if (game.hostId != null) {
@@ -108,25 +108,28 @@ class GameServiceImpl(
     }
 
     private fun pickAnswer(playerId: PlayerId, questionId: QuestionId, answerId: AnswerId) {
-        val player = playersStorage[playerId]
-        if (player != null) {
-            player.lastQuestionId = questionId
-            player.lastAnswerId = answerId
-            val currentQuestion = get(player.gameId).getCurrentQuestion()
-            if (questionId == currentQuestion?.id && currentQuestion.isRight(answerId)) {
-                player.score++
-            }
+        val player = playersStorage[playerId] ?: return
+        player.lastQuestionId = questionId
+        player.lastAnswerId = answerId
+        val game = get(player.gameId)
+        val currentQuestion = game.getCurrentQuestion()
+        if (game.state == GameState.QUESTION
+            && questionId == currentQuestion?.id
+            && currentQuestion.answers.any { it.id == answerId && it.isRight }) {
+            highScore -=  player.score to playerId
+            player.score++
+            highScore += player.score to playerId
         }
     }
 
     private fun leaveGame(playerId: PlayerId) {
-        val player = playersStorage.remove(playerId)
-        val game = player.let { gameStorage[player?.gameId] }
-        game?.playerIds?.remove(playerId)
+        val player = playersStorage[playerId]
+        if (player != null) {
+            val game = gameStorage[player.gameId]
+            game?.playerIds?.remove(playerId)
+        }
     }
 }
-
-private fun Question.isRight(answerId: AnswerId): Boolean = answers.find { it.id == answerId }?.isRight ?: false
 
 fun Game.getCurrentQuestion(): Question? = quizz.questions.find { it.id == currentQuestionId }
 

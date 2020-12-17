@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.lama.CreateQuizzDto
 import com.lama.GameId
 import com.lama.GameService
+import com.lama.HighScore
 import com.lama.QuizzId
 import com.lama.QuizzService
 import com.lama.StateChange
@@ -65,7 +66,7 @@ class HttpApi(
             val gameId = ctx.getGameId()
             val limit = ctx.request().getParam("limit")?.toInt() ?: 5
             val score = gameService.getHighScore(gameId, limit)
-            ctx.response().endWithJson(score)
+            ctx.response().endWithJson(HighScore(score))
         }
         get("/ws").handler {
             val payload = """

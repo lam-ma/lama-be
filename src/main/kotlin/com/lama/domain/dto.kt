@@ -3,7 +3,9 @@ package com.lama.domain
 import com.lama.AnswerId
 import com.lama.GameId
 import com.lama.GameState
+import com.lama.HighScore
 import com.lama.PlayerId
+import com.lama.PlayerScore
 import com.lama.Question
 import com.lama.QuestionId
 import com.lama.QuizzId
@@ -18,7 +20,8 @@ data class GameStateMessage(
     val title: String,
     val question: Question?,
     val rightAnswerIds: List<AnswerId>?,
-    val selectedAnswerId: AnswerId?
+    val selectedAnswerId: AnswerId?,
+    val scores: List<PlayerScore>?
 ) : ServerMessage("game_state")
 
 data class PlayerJoinedMessage(
