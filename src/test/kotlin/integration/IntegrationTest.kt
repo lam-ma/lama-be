@@ -10,7 +10,6 @@ import io.vertx.kotlin.coroutines.await
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
@@ -35,7 +34,7 @@ class IntegrationTest {
         assertThatJson(quizzBody).hasProperty("$.title", "New quizz")
         assertThatJson(quizzBody).hasProperty("$.questions[0].id", "q1")
         val quizzId = quizzBody.extract<String>("$.id")
-        
+
         val response2 = httpClient.get(port, "localhost", "/quizzes/$quizzId").send().await()
         assertThat(response2.statusCode()).isEqualTo(200)
         assertThat(response2.body().toString()).isEqualTo(response.body().toString())
@@ -81,37 +80,58 @@ class IntegrationTest {
 
     @Test
     fun `create and update game via ws`() = runBlocking<Unit> {
+        val response = httpClient.post(port, "localhost", "/quizzes").sendBuffer(Buffer.buffer(quizzJson)).await()
+        val quizzId = mapper.readTree(response.body().toString()).extract<String>("$.id")
+
         val hostClient = client
         val playerClient = LamaClient(port).apply { connect() }
 
-        val msg3 = playerClient.getMessage()
-        assertThatJson(msg3).hasProperty("$.type", "login")
-        val playerId = msg3.extract<String>("$.id")
-
-        val msg = hostClient.getMessage()
+        val msg = playerClient.getMessage()
         assertThatJson(msg).hasProperty("$.type", "login")
-        val hostId = msg.extract<String>("$.id")
-        assertThat(hostId).isNotNull
+        val playerId = msg.extract<String>("$.id")
 
-        hostClient.send(mapOf("type" to "create_game", "quizz_id" to "123"))
+        val msg1 = hostClient.getMessage()
+        assertThatJson(msg1).hasProperty("$.type", "login")
+
+        hostClient.send(mapOf("type" to "create_game", "quizz_id" to quizzId))
         val msg2 = hostClient.getMessage()
         assertThatJson(msg2).hasProperty("$.type", "game_state")
         assertThatJson(msg2).hasProperty("$.state", "QUESTION")
+        assertThatJson(msg2).hasProperty("$.question.id", "q1")
         val gameId = msg2.extract<String?>("$.game_id")
 
         playerClient.send(mapOf("type" to "join_game", "game_id" to gameId, "name" to "Aviv"))
-
 
         val msg4 = hostClient.getMessage()
         assertThatJson(msg4).hasProperty("$.type", "player_joined")
         assertThatJson(msg4).hasProperty("$.name", "Aviv")
         assertThatJson(msg4).hasProperty("$.id", playerId)
 
-        hostClient.send(mapOf("type" to "change_game", "game_id" to gameId, "question_id" to "qid_2", "state" to "ANSWER"))
         val msg5 = playerClient.getMessage()
         assertThatJson(msg5).hasProperty("$.type", "game_state")
         assertThatJson(msg5).hasProperty("$.game_id", gameId)
-        println(msg5)
+        assertThatJson(msg5).hasProperty("$.state", "QUESTION")
+        assertThatJson(msg5).hasProperty("$.question.id", "q1")
+        assertThatJson(msg5["selected_answer_id"]).isNull()
+        assertThatJson(msg5["right_answer_ids"]).isNull()
 
+        playerClient.send(mapOf("type" to "pick_answer", "question_id" to "q1", "answer_id" to "a1"))
+        hostClient.send(
+            mapOf("type" to "change_game", "game_id" to gameId, "question_id" to "q1", "state" to "ANSWER")
+        )
+
+        val msg6 = playerClient.getMessage()
+        assertThatJson(msg6).hasProperty("$.type", "game_state")
+        assertThatJson(msg6).hasProperty("$.game_id", gameId)
+        assertThatJson(msg6).hasProperty("$.state", "ANSWER")
+        assertThatJson(msg6).hasProperty("$.question.id", "q1")
+        assertThat(msg6["right_answer_ids"].map { it.asText() }).containsExactlyInAnyOrder("a3", "a2")
+
+        val msg7 = hostClient.getMessage()
+        assertThatJson(msg7).hasProperty("$.type", "game_state")
+        assertThatJson(msg7).hasProperty("$.game_id", gameId)
+        assertThatJson(msg7).hasProperty("$.state", "ANSWER")
+        assertThatJson(msg7).hasProperty("$.question.id", "q1")
+        assertThat(msg7["right_answer_ids"].map { it.asText() }).containsExactlyInAnyOrder("a3", "a2")
     }
 }

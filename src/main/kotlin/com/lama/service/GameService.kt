@@ -52,8 +52,11 @@ class GameServiceImpl(
         game.currentQuestionId = stateChange.questionId
         game.state = stateChange.state
 
-        game.playerIds.mapNotNull { playersStorage[it] }.forEach {
-            playerGateway.send(it.id, getMessage(game, it))
+        game.playerIds.forEach {
+            playerGateway.send(it, getMessage(game, playersStorage[it]))
+        }
+        if (game.hostId != null) {
+            playerGateway.send(game.hostId, getMessage(game, null))
         }
         //        TODO: clean up the game after finish
         return game
@@ -67,7 +70,7 @@ class GameServiceImpl(
             game.state,
             game.quizz.title,
             currentQuestion,
-            rightAnswerIds,
+            rightAnswerIds.takeIf { game.state == GameState.ANSWER },
             player?.lastAnswerId
         )
     }
@@ -105,12 +108,14 @@ class GameServiceImpl(
     }
 
     private fun pickAnswer(playerId: PlayerId, questionId: QuestionId, answerId: AnswerId) {
-        val player = playersStorage[playerId]!!
-        player.lastQuestionId = questionId
-        player.lastAnswerId = answerId
-        val currentQuestion = get(player.gameId).getCurrentQuestion()
-        if (questionId == currentQuestion?.id && currentQuestion.isRight(answerId)) {
-            player.score++
+        val player = playersStorage[playerId]
+        if (player != null) {
+            player.lastQuestionId = questionId
+            player.lastAnswerId = answerId
+            val currentQuestion = get(player.gameId).getCurrentQuestion()
+            if (questionId == currentQuestion?.id && currentQuestion.isRight(answerId)) {
+                player.score++
+            }
         }
     }
 

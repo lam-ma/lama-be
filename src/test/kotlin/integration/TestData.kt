@@ -26,7 +26,7 @@ val quizzJson = """
             {
               "id": "a4",
               "description": "Answer #4",
-              "is_right": true
+              "is_right": false
             }
           ]
         },
