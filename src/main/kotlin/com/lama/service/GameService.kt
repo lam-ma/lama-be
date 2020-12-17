@@ -74,7 +74,7 @@ class GameServiceImpl(
             currentQuestion,
             rightAnswerIds.takeIf { game.state == GameState.ANSWER },
             player?.lastAnswerId,
-            getHighScore(game.id, 10).takeIf { game.state == GameState.ANSWER }
+            getHighScore(game.id, 10).takeIf { game.state in setOf(GameState.ANSWER, GameState.FINISH) }
         )
     }
 
