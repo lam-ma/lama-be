@@ -56,6 +56,8 @@ data class Game(
     var currentQuestionId: QuestionId,
     var state: GameState,
     @JsonIgnore //TODO: make GameDto
+    val hostId: PlayerId?,
+    @JsonIgnore //TODO: make GameDto
     val playerIds: MutableSet<PlayerId> = LinkedHashSet()
 )
 
@@ -74,6 +76,7 @@ data class PlayerScore(
 )
 
 enum class GameState {
+    START,
     QUESTION,
     ANSWER,
     FINISH

@@ -38,6 +38,8 @@ dependencies {
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
+    testImplementation("org.assertj:assertj-core:3.16.1")
+    testImplementation("com.jayway.jsonpath:json-path:2.4.0")
 }
 
 tasks.test {
@@ -49,6 +51,7 @@ tasks.withType<KotlinCompile>() {
         jvmTarget = "11"
         apiVersion = "1.4"
         languageVersion = "1.4"
+        freeCompilerArgs += "-Xopt-in=kotlin.time.ExperimentalTime"
     }
 }
 

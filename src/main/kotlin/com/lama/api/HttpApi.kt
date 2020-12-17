@@ -47,7 +47,7 @@ class HttpApi(
         }
         post("/quizzes/:id/start").handler { ctx ->
             val quizzId = ctx.getQuizzId()
-            val game = gameService.startGame(quizzId)
+            val game = gameService.startGame(quizzId, null)
             ctx.response().setStatusCode(HttpStatus.CREATED.code).endWithJson(game)
         }
         get("/games/:id").handler { ctx ->

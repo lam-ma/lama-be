@@ -1,34 +1,27 @@
 package com.lama.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.lama.AnswerId
-import com.lama.Game
-import com.lama.GameId
+import com.fasterxml.jackson.module.kotlin.treeToValue
 import com.lama.GameService
-import com.lama.GameState
-import com.lama.Player
 import com.lama.PlayerId
-import com.lama.QuestionId
+import com.lama.domain.ChangeGameStateCommand
 import com.lama.domain.ClientCommand
-import com.lama.domain.FinishMessage
+import com.lama.domain.CreateGameCommand
 import com.lama.domain.JoinGameCommand
+import com.lama.domain.LeaveGameCommand
 import com.lama.domain.LoginMessage
 import com.lama.domain.PickAnswerCommand
-import com.lama.domain.RevealAnswerMessage
 import com.lama.domain.ServerMessage
-import com.lama.domain.ShowQuestionMessage
-import com.lama.getCurrentQuestion
 import com.lama.nextId
-import com.lama.service.GameStateListener
+import com.lama.service.PlayerGateway
 import io.vertx.core.http.ServerWebSocket
 import mu.KLogging
 
 class WsApi(
-    val mapper: ObjectMapper,
-) : GameStateListener {
+    private val mapper: ObjectMapper,
+) : PlayerGateway {
     lateinit var gameService: GameService
-    val clients = mutableMapOf<PlayerId, ConnectedClient>()
+    private val clients = mutableMapOf<PlayerId, ConnectedClient>()
 
     fun handle(ws: ServerWebSocket) {
         ws.accept()
@@ -36,62 +29,40 @@ class WsApi(
         val client = ConnectedClient(playerId, ws)
         clients[playerId] = client
         logger.info("Joined $playerId on ${ws.path()}")
-        ws.textMessageHandler { msg -> handleClientCommand(msg, playerId) }
+        ws.textMessageHandler { msg ->
+            handleClientCommand(msg, playerId)
+        }
         ws.closeHandler {
             logger.info("Disconnected $playerId")
-            gameService.leaveGame(playerId)
+            gameService.handle(playerId, LeaveGameCommand)
             clients.remove(playerId)
         }
-        client.send(LoginMessage(playerId))
+        send(playerId, LoginMessage(playerId))
     }
 
     private fun handleClientCommand(msg: String, playerId: PlayerId) {
         logger.info("Got $msg from $playerId")
         val command = parseClientCommand(msg)
-        when (command) {
-            null -> logger.warn("Unknown command: $msg")
-            is JoinGameCommand -> gameService.joinGame(command.gameId, playerId, command.name)
-            is PickAnswerCommand -> gameService.pickAnswer(playerId, command.questionId, command.answerId)
+        if (command == null) {
+            logger.warn("Unknown command: $msg")
+            return
         }
+        gameService.handle(playerId, command)
     }
 
     private fun parseClientCommand(msg: String): ClientCommand? {
         val json = mapper.readTree(msg)
-        val command = when (json["type"].asText()) {
-            "join_game" -> JoinGameCommand(json["name"].asText(), GameId(json["game_id"].asText()))
-            "pick_answer" -> PickAnswerCommand(
-                QuestionId(json["question_id"].asText()),
-                AnswerId(json["answer_id"].asText())
-            )
+        return when (json["type"].asText()) {
+            "create_game" -> mapper.treeToValue<CreateGameCommand>(json)
+            "change_game" -> mapper.treeToValue<ChangeGameStateCommand>(json)
+            "join_game" -> mapper.treeToValue<JoinGameCommand>(json)
+            "pick_answer" -> mapper.treeToValue<PickAnswerCommand>(json)
             else -> null
         }
-        return command
     }
 
-    override fun stateChanged(game: Game, players: List<Player>) {
-        players.forEach { player ->
-            val client = clients[player.id]
-            if (client != null) {
-                val msg = getMessage(game, player)
-                client.send(msg)
-            }
-        }
-    }
-
-    private fun getMessage(game: Game, player: Player): ServerMessage =
-        when (game.state) {
-            GameState.FINISH -> FinishMessage
-            GameState.QUESTION -> ShowQuestionMessage(game.getCurrentQuestion()) //TODO: do not send right answer
-            GameState.ANSWER -> {
-                val question = game.getCurrentQuestion()
-                val rightAnswerIds = question.answers.filter { it.isRight }.map { it.id }
-                val lastAnswerId = player.lastAnswerId?.takeIf {  player.lastQuestionId == question.id }
-                RevealAnswerMessage(question, rightAnswerIds, lastAnswerId)
-            }
-        }
-
-    private fun ConnectedClient.send(cmd: ServerMessage) {
-        ws.writeTextMessage(mapper.writeValueAsString(cmd))
+    override fun send(playerId: PlayerId, message: ServerMessage) {
+        clients[playerId]?.ws?.writeTextMessage(mapper.writeValueAsString(message))
     }
 
     companion object : KLogging()

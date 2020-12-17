@@ -17,6 +17,7 @@ val picUrl = "https://pbs.twimg.com/profile_images/1311712724708188161/EfsqxEuP_
 
 suspend fun main() {
     val port = (System.getenv("LAMA_BE_PORT") ?: "8080").toInt()
+    println("Starting lama be on port $port")
     val vertx = Vertx.vertx()
     val mapper = createObjectMapper()
     val quizzService = QuizzServiceImpl()
