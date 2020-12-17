@@ -3,6 +3,10 @@ package integration
 import com.lama.assertThatJson
 import com.lama.extract
 import com.lama.hasProperty
+import com.lama.httpClient
+import com.lama.mapper
+import io.vertx.core.buffer.Buffer
+import io.vertx.kotlin.coroutines.await
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
@@ -25,6 +29,35 @@ class IntegrationTest {
 
     @BeforeEach
     fun cleanUp() {
+    }
+
+    @Test
+    fun `quizz CRUD`() = runBlocking<Unit> {
+        val response = httpClient.post(port, "localhost", "/quizzes").sendBuffer(Buffer.buffer(quizzJson)).await()
+        assertThat(response.statusCode()).isEqualTo(201)
+        val quizzBody = mapper.readTree(response.body().toString())
+        assertThatJson(quizzBody).hasProperty("$.title", "New quizz")
+        assertThatJson(quizzBody).hasProperty("$.questions[0].id", "q1")
+        val quizzId = quizzBody.extract<String>("$.id")
+        
+        val response2 = httpClient.get(port, "localhost", "/quizzes/$quizzId").send().await()
+        assertThat(response2.statusCode()).isEqualTo(200)
+        assertThat(response2.body().toString()).isEqualTo(response.body().toString())
+
+        val updatedQuizzJson = quizzJson.replace("\"q1\"", "\"q_new\"")
+        val response3 = httpClient
+            .put(port, "localhost", "/quizzes/$quizzId")
+            .sendBuffer(Buffer.buffer(updatedQuizzJson))
+            .await()
+        assertThat(response3.statusCode()).isEqualTo(200)
+        val updatedBody = mapper.readTree(response3.body().toString())
+        assertThatJson(updatedBody).hasProperty("$.id", quizzId)
+        assertThatJson(updatedBody).hasProperty("$.questions[0].id", "q_new")
+    }
+
+    @Test
+    fun `create and update game via rest`() = runBlocking<Unit> {
+
     }
 
     @Test
