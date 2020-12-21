@@ -122,14 +122,19 @@ class IntegrationTest {
             mapOf("type" to "change_game", "game_id" to gameId, "question_id" to "q1", "state" to "ANSWER")
         )
 
+        val msg8 = hostClient.getMessage()
+        assertThatJson(msg8).hasProperty("$.type", "answer_given")
+        assertThatJson(msg8).hasProperty("$.question_id", "q1")
+        assertThatJson(msg8).hasProperty("$.count", 1)
+
         val msg6 = playerClient.getMessage()
         assertThatJson(msg6).hasProperty("$.type", "game_state")
         assertThatJson(msg6).hasProperty("$.game_id", gameId)
         assertThatJson(msg6).hasProperty("$.state", "ANSWER")
         assertThatJson(msg6).hasProperty("$.question.id", "q1")
         assertThatJson(msg6).hasProperty("$.right_answer_ids[*]", listOf("a2", "a3"))
-        assertThatJson(msg6).hasProperty("$.scores[*].name", listOf("Aviv"))
-        assertThatJson(msg6).hasProperty("$.scores[*].score", listOf(1))
+        assertThatJson(msg6["scores"]).isNull()
+        assertThatJson(msg6["answers_count"]).isNull()
 
         val msg7 = hostClient.getMessage()
         assertThatJson(msg7).hasProperty("$.type", "game_state")
@@ -137,5 +142,8 @@ class IntegrationTest {
         assertThatJson(msg7).hasProperty("$.state", "ANSWER")
         assertThatJson(msg7).hasProperty("$.question.id", "q1")
         assertThatJson(msg7).hasProperty("$.right_answer_ids[*]", listOf("a2", "a3"))
+        assertThatJson(msg7).hasProperty("$.scores[*].name", listOf("Aviv"))
+        assertThatJson(msg7).hasProperty("$.scores[*].score", listOf(1))
+        assertThatJson(msg7).hasProperty("$.answers_count", mapOf("a2" to 1))
     }
 }

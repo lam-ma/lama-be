@@ -36,13 +36,15 @@ when game is finished he sees finish state
 
 
 Player ws exchange:
-1. server:  {"type": "login", "id": "ef73bbf"}
+1. server: {"type": "login", "id": "ef73bbf"}
 2. client: {"type": "join_game", "name": "Misha", "game_id": "blah"}
-3. server:  {"type": "game_state", "game_id": "123", "title": "quizz title", "state": "QUESTION", "question": {...}, "right_answer_ids": ["blah"], "selected_answer_id": null }
+3. server: {"type": "game_state", "game_id": "123", "title": "quizz title", "state": "QUESTION", "question": {...}, "right_answer_ids": ["blah"], "selected_answer_id": null, "scores": [{"name": "Aviv", score: 22}], "answers_count": {"answer_id_1": 8} }
 4. client: {"type": "pick_answer", "question_id": "q1", "answer_id": "a1"}
                    
 Host ws exchange:
-1. server:  {"type": "login", "id": "ef73bbf"}
+1. server: {"type": "login", "id": "ef73bbf"}
 2. client: {"type": "create_game", "quizz_id": "123"}
-3. server:  {"type": "game_state", ...} // same as for player
-4. server:  {"type": "player_joined", "id": "blah", "name": "Leslye", "total_players": 10} 
+3. server: {"type": "game_state", ...} // same as for player
+4. server: {"type": "player_joined", "id": "blah", "name": "Leslye", "total_players": 10} 
+5. client: {"type": "change_game", "game_id": "blah", "question_id": "q1", "state": "ANSWER"} 
+6. server: {"type": "answer_given", "question_id": "blah", "count": 12}

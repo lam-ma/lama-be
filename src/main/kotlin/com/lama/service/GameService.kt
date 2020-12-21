@@ -1,5 +1,6 @@
 package com.lama
 
+import com.lama.domain.AnswerGivenMessage
 import com.lama.domain.ChangeGameStateCommand
 import com.lama.domain.ClientCommand
 import com.lama.domain.CreateGameCommand
@@ -38,7 +39,7 @@ class GameServiceImpl(
         val game = Game(GameId(nextId()), quizz, quizz.questions.first().id, GameState.QUESTION, hostId)
         gameStorage[game.id] = game
         if (hostId != null) {
-            playerGateway.send(hostId, getMessage(game, null))
+            playerGateway.send(hostId, getMessage(game, hostId))
         }
         return game
     }
@@ -48,33 +49,45 @@ class GameServiceImpl(
 
     override fun update(gameId: GameId, stateChange: StateChange): Game {
         val game = get(gameId)
+        if (game.state == GameState.FINISH) {
+            throw GameUpdateException("Game $gameId is already finished")
+        }
         if (game.quizz.questions.none { it.id == stateChange.questionId }) {
             throw GameUpdateException("Question ${stateChange.questionId} does not belong to game $gameId")
+        }
+        if (game.currentQuestionId != stateChange.questionId) {
+            game.answersGiven.clear()
         }
         game.currentQuestionId = stateChange.questionId
         game.state = stateChange.state
 
         game.playerIds.forEach {
-            playerGateway.send(it, getMessage(game, playersStorage[it]))
+            playerGateway.send(it, getMessage(game, it))
         }
         if (game.hostId != null) {
-            playerGateway.send(game.hostId, getMessage(game, null))
+            playerGateway.send(game.hostId, getMessage(game, game.hostId))
         }
         //        TODO: clean up the game after finish
         return game
     }
 
-    private fun getMessage(game: Game, player: Player?): ServerMessage {
+    private fun getMessage(game: Game, playerId: PlayerId): ServerMessage {
         val currentQuestion = game.getCurrentQuestion()
-        val rightAnswerIds = currentQuestion?.answers?.filter { it.isRight }?.map { it.id }
+        val rightAnswerIds = currentQuestion.answers.filter { it.isRight }.map { it.id }
+        val player = playersStorage[playerId]
+        val selectedAnswerId = if (player?.lastQuestionId == game.currentQuestionId) player.lastAnswerId else null
+        val isHost = playerId == game.hostId
+        val isAnswerOrFinish = game.state in setOf(GameState.ANSWER, GameState.FINISH)
+        val highScore = if (isAnswerOrFinish && isHost) getHighScore(game.id, 10) else null
         return GameStateMessage(
             game.id,
             game.state,
             game.quizz.title,
             currentQuestion,
             rightAnswerIds.takeIf { game.state == GameState.ANSWER },
-            player?.lastAnswerId,
-            getHighScore(game.id, 10).takeIf { game.state in setOf(GameState.ANSWER, GameState.FINISH) }
+            selectedAnswerId,
+            highScore,
+            game.answersGiven.takeIf { isHost }
         )
     }
 
@@ -100,7 +113,7 @@ class GameServiceImpl(
         game.playerIds += playerId
         highScore += newPlayer.score to playerId
         playersStorage[playerId] = newPlayer
-        playerGateway.send(playerId, getMessage(game, newPlayer))
+        playerGateway.send(playerId, getMessage(game, playerId))
         if (game.hostId != null) {
             playerGateway.send(game.hostId, PlayerJoinedMessage(newPlayer.id, newPlayer.name, game.playerIds.size))
         }
@@ -113,25 +126,28 @@ class GameServiceImpl(
         player.lastAnswerId = answerId
         val game = get(player.gameId)
         val currentQuestion = game.getCurrentQuestion()
-        if (game.state == GameState.QUESTION
-            && questionId == currentQuestion?.id
-            && currentQuestion.answers.any { it.id == answerId && it.isRight }) {
-            highScore -=  player.score to playerId
-            player.score++
-            highScore += player.score to playerId
+        if (game.state == GameState.QUESTION && questionId == currentQuestion.id) {
+            game.answersGiven.merge(answerId, 1) { old, new -> old + new }
+            if (game.hostId != null) {
+                playerGateway.send(game.hostId, AnswerGivenMessage(currentQuestion.id, game.answersGiven.values.sum()))
+            }
+            if (currentQuestion.answers.any { it.id == answerId && it.isRight }) {
+                highScore -=  player.score to playerId
+                player.score++
+                highScore += player.score to playerId
+            }
         }
     }
 
     private fun leaveGame(playerId: PlayerId) {
         val player = playersStorage[playerId]
         if (player != null) {
-            val game = gameStorage[player.gameId]
-            game?.playerIds?.remove(playerId)
+            gameStorage[player.gameId]?.playerIds?.remove(playerId)
         }
     }
 }
 
-fun Game.getCurrentQuestion(): Question? = quizz.questions.find { it.id == currentQuestionId }
+fun Game.getCurrentQuestion(): Question = quizz.questions.find { it.id == currentQuestionId }!!
 
 fun nextId(): String = toHexString(nextInt()).toString()
 

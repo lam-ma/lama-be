@@ -58,7 +58,9 @@ data class Game(
     @JsonIgnore //TODO: make GameDto
     val hostId: PlayerId?,
     @JsonIgnore //TODO: make GameDto
-    val playerIds: MutableSet<PlayerId> = LinkedHashSet()
+    val playerIds: MutableSet<PlayerId> = LinkedHashSet(),
+    @JsonIgnore //TODO: make GameDto
+    val answersGiven: MutableMap<AnswerId, Int> = HashMap()
 )
 
 data class StateChange(

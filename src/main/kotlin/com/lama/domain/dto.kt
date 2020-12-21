@@ -21,7 +21,8 @@ data class GameStateMessage(
     val question: Question?,
     val rightAnswerIds: List<AnswerId>?,
     val selectedAnswerId: AnswerId?,
-    val scores: List<PlayerScore>?
+    val scores: List<PlayerScore>?,
+    val answersCount: Map<AnswerId, Int>?
 ) : ServerMessage("game_state")
 
 data class PlayerJoinedMessage(
@@ -29,6 +30,11 @@ data class PlayerJoinedMessage(
     val name: String,
     val totalPlayers: Int
 ) : ServerMessage("player_joined")
+
+data class AnswerGivenMessage(
+    val questionId: QuestionId,
+    val count: Int,
+) : ServerMessage("answer_given")
 
 sealed class ClientCommand
 
