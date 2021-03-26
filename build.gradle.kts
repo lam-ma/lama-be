@@ -46,7 +46,7 @@ tasks.test {
     useJUnitPlatform()
 }
 
-tasks.withType<KotlinCompile>() {
+tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = "11"
         apiVersion = "1.4"
